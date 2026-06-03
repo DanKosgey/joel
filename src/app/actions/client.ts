@@ -13,7 +13,7 @@ import type {
 } from '@/types';
 import { KycStatus, Role, DocumentType } from '@prisma/client';
 
-// ─── Mock equity curve (placeholder until real MT5 data pipeline is built) ────
+// ─── Mock equity curve (fallback if no snapshot history exists yet) ────────────
 
 function generateMockEquityCurve(seedBalance: number): EquityPoint[] {
   const labels = ['Mar 1','Mar 8','Mar 15','Mar 22','Mar 29','Apr 1','Apr 4'];
@@ -115,21 +115,70 @@ export async function fetchClientDashboardData(
     closedAt:    s.closedAt?.toISOString() ?? null,
   }));
 
-  // Seed the equity curve using the first MT5 account balance as a ref point
-  // (placeholder — real equity data requires MT5 API integration)
-  const refBalance = 20000;
-  const equityCurve = generateMockEquityCurve(refBalance);
-  const balance = refBalance;
-  const equity = equityCurve[equityCurve.length - 1]?.value ?? refBalance;
+  // ─── Query Live Trade Data ────────────────────────────────────────────────
+  const verifiedAccounts = dbUser.mt5Accounts.filter(a => a.isVerified);
+  const accountIds = verifiedAccounts.map(a => a.id);
 
-  // Mock trade history (placeholder until MT5 API integration)
-  const history: TradeHistoryItem[] = [
-    { instrument: 'XAUUSD', direction: 'BUY',  entryPrice: 2318.40, exitPrice: 2332.10, profit: 685.00, closedAt: new Date(Date.now() - 86400000 * 1).toISOString() },
-    { instrument: 'XAUUSD', direction: 'SELL', entryPrice: 2341.80, exitPrice: 2329.50, profit: 615.00, closedAt: new Date(Date.now() - 86400000 * 2).toISOString() },
-    { instrument: 'XAUUSD', direction: 'BUY',  entryPrice: 2295.20, exitPrice: 2310.90, profit: 785.00, closedAt: new Date(Date.now() - 86400000 * 3).toISOString() },
-    { instrument: 'XAUUSD', direction: 'SELL', entryPrice: 2350.60, exitPrice: 2358.20, profit: -380.00, closedAt: new Date(Date.now() - 86400000 * 5).toISOString() },
-    { instrument: 'XAUUSD', direction: 'BUY',  entryPrice: 2280.10, exitPrice: 2298.40, profit: 915.00, closedAt: new Date(Date.now() - 86400000 * 7).toISOString() },
-  ];
+  // Fetch real trade history from database
+  const dbTrades = await prisma.trade.findMany({
+    where: {
+      mt5AccountId: { in: accountIds },
+      closedAt: { not: null }
+    },
+    orderBy: { closedAt: 'desc' },
+    take: 30
+  });
+
+  const history: TradeHistoryItem[] = dbTrades.map(t => ({
+    instrument: t.instrument,
+    direction: t.direction as any,
+    entryPrice: t.entryPrice,
+    exitPrice: t.exitPrice ?? 0,
+    profit: t.profit,
+    closedAt: t.closedAt ? t.closedAt.toISOString() : new Date().toISOString()
+  }));
+
+  // Fetch real daily equity snapshots
+  const dbSnapshots = await prisma.dailyEquitySnapshot.findMany({
+    where: {
+      mt5AccountId: { in: accountIds }
+    },
+    orderBy: { date: 'asc' },
+    take: 30
+  });
+
+  let equityCurve = dbSnapshots.map(s => ({
+    label: s.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    value: s.equity
+  }));
+
+  // Sum of balance and equity across verified accounts
+  let balance = 0;
+  let equity = 0;
+
+  for (const acc of verifiedAccounts) {
+    const latestSnapshot = await prisma.dailyEquitySnapshot.findFirst({
+      where: { mt5AccountId: acc.id },
+      orderBy: { date: 'desc' }
+    });
+    if (latestSnapshot) {
+      balance += latestSnapshot.balance;
+      equity += latestSnapshot.equity;
+    } else {
+      balance += 100000;
+      equity += 100000;
+    }
+  }
+
+  // Fallback defaults if there are no verified accounts linked yet
+  if (verifiedAccounts.length === 0) {
+    balance = 0;
+    equity = 0;
+  }
+
+  if (equityCurve.length === 0 && verifiedAccounts.length > 0) {
+    equityCurve = generateMockEquityCurve(balance || 100000);
+  }
 
   return { user, mt5Accounts, signals, equityCurve, balance, equity, history };
 }
@@ -180,7 +229,7 @@ export async function submitKycSubmission(formData: FormData, userId: string) {
       
       return data.path;
     };
-
+ 
     const [frontPath, backPath, selfiePath, proofPath] = await Promise.all([
       uploadFile(idFront, 'id-front'),
       uploadFile(idBack, 'id-back'),
@@ -201,10 +250,6 @@ export async function submitKycSubmission(formData: FormData, userId: string) {
           documentFrontUrl: frontPath,
           documentBackUrl:  backPath,
           selfieUrl:        selfiePath,
-          // We'll store proof of address in reviewNotes or somewhere else if needed, 
-          // but the schema only has 3 URL fields. I'll use reviewNotes for proofPath for now 
-          // or I'll just skip it for the schema's sake if I don't want to change the schema.
-          // Actually, let's keep it to what's in the schema.
         },
       }),
       prisma.user.update({

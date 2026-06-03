@@ -1,0 +1,130 @@
+.landingContainer {
+  min-height: 100vh;
+  background: url('/bg.png') center center / cover no-repeat;
+  color: #111827; /* Dark text on light background */
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.topNav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 48px;
+  background: transparent;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo span {
+  color: #16a34a;
+}
+
+.loginBtn {
+  background: #111827;
+  color: #ffffff;
+  padding: 10px 28px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  border: 1px solid transparent;
+}
+
+.loginBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: #1f2937;
+}
+
+.heroSection {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+  padding: 0 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.title {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 900;
+  letter-spacing: -3px;
+  line-height: 1;
+  margin-bottom: 24px;
+  max-width: 800px;
+  color: #111827; /* Darkest slate/black */
+}
+
+.title span {
+  color: #16a34a; /* Brand green */
+}
+
+.subtitle {
+  font-size: 17px;
+  color: #374151;
+  max-width: 500px;
+  line-height: 1.6;
+  margin-bottom: 48px;
+  font-weight: 500;
+}
+
+.ctaGroup {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.primaryCta {
+  background: #16a34a;
+  color: #ffffff;
+  padding: 16px 32px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+}
+
+.primaryCta:hover {
+  transform: translateY(-2px);
+  background: #15803d;
+  box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+}
+
+.secondaryCta {
+  background: transparent;
+  color: #111827;
+  padding: 16px 32px;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  transition: all 0.3s ease;
+}
+
+.secondaryCta:hover {
+  background: rgba(17, 24, 39, 0.05);
+  border-color: rgba(17, 24, 39, 0.4);
+}

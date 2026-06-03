@@ -68,7 +68,11 @@ model Mt5Account {
   createdAt     DateTime @default(now())
 
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades         Trade[]
+  dailySnapshots DailyEquitySnapshot[]
+  riskBreaches   RiskBreach[]
+  executions     SignalExecutionLog[]
 
   @@index([userId])
 }
@@ -106,10 +110,103 @@ model Signal {
   closedAt      DateTime?
 
   // Relations
-  admin User @relation("BroadcastedByAdmin", fields: [adminId], references: [id])
+  admin      User                 @relation("BroadcastedByAdmin", fields: [adminId], references: [id])
+  trades     Trade[]
+  executions SignalExecutionLog[]
 
   @@index([adminId])
   @@index([status])
   @@index([openedAt])
+}
+
+model Trade {
+  id             String    @id @default(uuid())
+  mt5AccountId   String
+  ticket         String    @unique // MT5 ticket number
+  instrument     String    @default("XAUUSD")
+  direction      String    // BUY or SELL
+  lots           Float
+  entryPrice     Float
+  exitPrice      Float?
+  profit         Float
+  commission     Float     @default(0.0)
+  swap           Float     @default(0.0)
+  openedAt       DateTime
+  closedAt       DateTime?
+  signalId       String?   // Links to broadcasted system signal if copy-traded
+  createdAt      DateTime  @default(now())
+
+  // Relations
+  mt5Account     Mt5Account @relation(fields: [mt5AccountId], references: [id], onDelete: Cascade)
+  signal         Signal?    @relation(fields: [signalId], references: [id])
+
+  @@index([mt5AccountId])
+  @@index([closedAt])
+}
+
+model DailyEquitySnapshot {
+  id             String    @id @default(uuid())
+  mt5AccountId   String
+  date           DateTime  @db.Date
+  balance        Float
+  equity         Float
+  margin         Float     @default(0.0)
+  freeMargin     Float     @default(0.0)
+  drawdown       Float     @default(0.0) // Peak-to-trough drawdown percentage on this day
+  createdAt      DateTime  @default(now())
+
+  // Relations
+  mt5Account     Mt5Account @relation(fields: [mt5AccountId], references: [id], onDelete: Cascade)
+
+  @@unique([mt5AccountId, date])
+  @@index([date])
+}
+
+model RiskBreach {
+  id             String    @id @default(uuid())
+  mt5AccountId   String
+  type           String    // "MAX_DAILY_DRAWDOWN" | "MAX_TOTAL_DRAWDOWN" | "UNAUTHORIZED_SYMBOL" | "MAX_LOTS_EXCEEDED"
+  description    String
+  breachedValue  Float
+  limitValue     Float
+  status         String    @default("ACTIVE") // "ACTIVE" | "RESOLVED" | "WAIVED"
+  detectedAt     DateTime  @default(now())
+  resolvedAt     DateTime?
+  reviewNotes    String?
+
+  // Relations
+  mt5Account     Mt5Account @relation(fields: [mt5AccountId], references: [id], onDelete: Cascade)
+
+  @@index([mt5AccountId])
+  @@index([status])
+}
+
+model SignalExecutionLog {
+  id             String    @id @default(uuid())
+  signalId       String
+  mt5AccountId   String
+  status         String    // "PENDING" | "EXECUTED" | "FAILED"
+  executionPrice Float?
+  errorMessage   String?
+  executedAt     DateTime?
+  
+  // Relations
+  signal         Signal     @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  mt5Account     Mt5Account @relation(fields: [mt5AccountId], references: [id], onDelete: Cascade)
+
+  @@unique([signalId, mt5AccountId])
+}
+
+model CompanyGrowthSnapshot {
+  id                   String   @id @default(uuid())
+  date                 DateTime @unique @db.Date
+  totalAum             Float    // Sum of all client equities
+  activeClients        Int      // Verified users with linked mt5 accounts
+  totalDeposit         Float    // Accumulation of deposits
+  totalWithdrawal      Float    // Accumulation of withdrawals
+  netRevenue           Float    // Calculated from commission/performance fees
+  averageClientWinRate Float
+  averageDrawdown      Float
+  createdAt            DateTime @default(now())
 }
 

@@ -138,20 +138,9 @@ export default function SignupView() {
       <div className="login-hero">
         <div className="hero-grid"></div>
         <div className="hero-glow"></div>
-        <div className="hero-headline">Simple Signals.<br/>Real <em>Results.</em></div>
-        <div className="hero-tagline">Get real-time gold (XAU/USD) signals placed by experienced administrators. Follow trades and track your account performance easily.</div>
-        <div className="hero-kpis">
-          <div className="hero-kpi"><div className="hero-kpi-val">+41.3%</div><div className="hero-kpi-label">Annual Return</div></div>
-          <div className="hero-kpi"><div className="hero-kpi-val">74.8%</div><div className="hero-kpi-label">Win Rate</div></div>
-          <div className="hero-kpi"><div className="hero-kpi-val">2.91</div><div className="hero-kpi-label">Profit Factor</div></div>
-        </div>
-        <div className="gold-ticker">
-          <div className="ticker-dot"></div>
-          <div className="gold-ticker-label">XAU/USD Live</div>
-          <div className="gold-ticker-price">{priceStr}</div>
-          <div className="gold-ticker-change" style={{ color: up ? 'var(--green)' : 'var(--red)' }}>
-            {chgStr}
-          </div>
+        <div className="hero-content-wrapper">
+          <div className="hero-headline">Simple Signals.<br/>Real <em>Results.</em></div>
+          <div className="hero-tagline">Get real-time gold (XAU/USD) signals placed by experienced administrators. Follow trades and track your account performance easily.</div>
         </div>
       </div>
     </div>

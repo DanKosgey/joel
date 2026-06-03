@@ -8,7 +8,6 @@ import { useStore } from '../lib/StoreContext';
 export default function LoginView() {
   const router = useRouter();
   const { ticker } = useStore();
-  const [tab, setTab] = useState<'client' | 'admin'>('client');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [err, setErr] = useState('');
@@ -83,17 +82,10 @@ export default function LoginView() {
       </div>
 
       <div className="login-panel">
-        <div className="tab-row">
-          <button className={`tab-btn ${tab === 'client' ? 'active' : ''}`} onClick={() => setTab('client')}>User Sign In</button>
-          <button className={`tab-btn ${tab === 'admin' ? 'active' : ''}`} onClick={() => setTab('admin')}>Admin Sign In</button>
-        </div>
-
-        <form onSubmit={handleLogin}>
-          <div className="login-heading">{tab === 'client' ? 'Sign In' : 'Admin Sign In'}</div>
+        <form onSubmit={handleLogin} style={{ marginTop: '40px' }}>
+          <div className="login-heading">Sign In to NexusFX</div>
           <div className="login-sub">
-            {tab === 'client' 
-              ? 'View real-time signals, submit compliance docs, and monitor your trading dashboard.' 
-              : 'Sign in to place trading signals and manage user verification queues.'}
+            Securely access your trading dashboard, view real-time signals, and manage your account.
           </div>
           
           {err && <div className="alert alert-err" style={{ marginBottom: 32 }}>{err}</div>}
@@ -112,9 +104,7 @@ export default function LoginView() {
             {loading ? "Signing In..." : "Sign In"}
           </button>
           
-          {tab === 'client' && (
-            <button type="button" className="btn btn-ghost" onClick={() => router.push('/register')}>Create an Account →</button>
-          )}
+          <button type="button" className="btn btn-ghost" onClick={() => router.push('/register')}>Create an Account →</button>
 
           <div style={{ textAlign: 'center', marginTop: 40 }}>
              <div style={{ fontSize: 13, color: 'var(--t4)', fontWeight: 500 }}>
@@ -128,12 +118,9 @@ export default function LoginView() {
       <div className="login-hero">
         <div className="hero-grid"></div>
         <div className="hero-glow"></div>
-        <div className="hero-headline">Simple Signals.<br/>Real <em>Results.</em></div>
-        <div className="hero-tagline">Get real-time gold (XAU/USD) signals placed by experienced administrators. Follow trades and track your account performance easily.</div>
-        <div className="hero-kpis">
-          <div className="hero-kpi"><div className="hero-kpi-val">+41.3%</div><div className="hero-kpi-label">Annual Return</div></div>
-          <div className="hero-kpi"><div className="hero-kpi-val">74.8%</div><div className="hero-kpi-label">Win Rate</div></div>
-          <div className="hero-kpi"><div className="hero-kpi-val">2.91</div><div className="hero-kpi-label">Profit Factor</div></div>
+        <div className="hero-content-wrapper">
+          <div className="hero-headline">Precision Trading.<br/>Elevated <em>Experience.</em></div>
+          <div className="hero-tagline">Access institutional-grade XAU/USD signals instantly. A modern, lightning-fast platform built for high-performance trading.</div>
         </div>
       </div>
     </div>
