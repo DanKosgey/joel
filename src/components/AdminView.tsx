@@ -98,6 +98,7 @@ export default function AdminView({ initialData }: { initialData: AdminDashboard
 
   return (
     <div id="view-admin" className="fade-in" style={{ width: '100%' }}>
+      {mobMenuOpen && <div className="sidebar-overlay active" onClick={() => setMobMenuOpen(false)} />}
       <div className={`sidebar ${mobMenuOpen ? 'open' : ''}`}>
         <div className="sb-brand">
           <div className="sb-logo">
@@ -131,6 +132,10 @@ export default function AdminView({ initialData }: { initialData: AdminDashboard
       </div>
 
       <div className="main">
+        <div className="mob-header">
+           <div className="sb-name">NexusFX<small style={{ color: 'var(--red)' }}>Admin</small></div>
+           <button className="mob-menu-btn" onClick={() => setMobMenuOpen(!mobMenuOpen)}>☰</button>
+        </div>
         <div className="topbar">
           <div className="topbar-title">Admin Dashboard</div>
           <div className="topbar-right">
@@ -220,8 +225,8 @@ export default function AdminView({ initialData }: { initialData: AdminDashboard
             {tab === 'a-clients' && (
               <div>
                 <div className="sec-hdr"><div className="sec-title">Manage Linked Accounts</div></div>
-                <div className="tbl-container">
-                  <table>
+                <div className="tbl-container" style={{ overflowX: 'auto' }}>
+                  <table style={{ minWidth: 700 }}>
                     <thead><tr><th>Name</th><th>Email Address</th><th>Status</th><th>Balance</th><th>Verification Status</th><th>Created On</th><th style={{ textAlign: 'right' }}>Actions</th></tr></thead>
                     <tbody>
                       {clients.map((c, i) => (

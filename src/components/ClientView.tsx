@@ -80,6 +80,7 @@ export default function ClientView({ initialData, userId }: { initialData: Clien
 
   return (
     <div id="view-client" className="fade-in">
+      {mobMenuOpen && <div className="sidebar-overlay active" onClick={() => setMobMenuOpen(false)} />}
       <div className={`sidebar ${mobMenuOpen ? 'open' : ''}`}>
         <div className="sb-brand">
           <div className="sb-logo">
@@ -173,12 +174,12 @@ export default function ClientView({ initialData, userId }: { initialData: Clien
                       <div className="leg-item"><div className="leg-dot" style={{ background: 'var(--card2)' }}></div> Starting Value</div>
                     </div>
                   </div>
-                  <div className="tbl-container">
+                  <div className="tbl-container" style={{ overflowX: 'auto' }}>
                     <div className="sec-hdr" style={{ padding: '20px 24px', marginBottom: 0 }}>
                       <div className="sec-title">Recent Trades</div>
                     </div>
                     {initialData.history.length > 0 ? (
-                      <table>
+                      <table style={{ minWidth: 600 }}>
                         <thead><tr><th>Symbol</th><th>Direction</th><th>Entry</th><th>Exit</th><th>Profit</th><th>Date</th></tr></thead>
                         <tbody>
                           {initialData.history.map((h, i) => (

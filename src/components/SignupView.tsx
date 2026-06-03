@@ -65,9 +65,28 @@ export default function SignupView() {
   };
 
   return (
-    <div id="view-login">
+    <div id="view-login" className="fade-in">
+      <div className="login-header-fixed">
+        <div className="logo-mark" style={{ marginBottom: 0 }}>
+          <div className="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5">
+              <path d="M12 2v20M17 5H7M17 19H7M2 12h20" opacity="0.5"/>
+              <rect x="2" y="2" width="20" height="20" rx="4" stroke="currentColor"/>
+              <circle cx="12" cy="12" r="3" fill="#fff"/>
+            </svg>
+          </div>
+          <div className="logo-text">Nexus<span>FX</span></div>
+        </div>
+        <div className="top-bar-ticker">
+          <div className="ticker-pulse"></div>
+          <span style={{ color: 'var(--t4)', fontWeight: 700 }}>XAU/USD</span>
+          <span style={{ fontWeight: 800 }}>{priceStr}</span>
+          <span style={{ color: up ? 'var(--green)' : 'var(--red)' }}>{chgStr}</span>
+        </div>
+      </div>
+
       <div className="login-panel">
-        <div className="logo-mark">
+        <div className="logo-mark" style={{ display: 'none' }}>
           <div className="logo-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="2" width="20" height="8" rx="2" stroke="none" fill="rgba(255,255,255,0.2)"/>
