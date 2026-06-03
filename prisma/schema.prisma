@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CLIENT
+  ADMIN
+}
+
+enum KycStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum DocumentType {
+  PASSPORT
+  ID_CARD
+}
+
+enum SignalDirection {
+  BUY
+  SELL
+}
+
+enum SignalStatus {
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         Role      @default(CLIENT)
+  kycStatus    KycStatus @default(PENDING)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  mt5Accounts    Mt5Account[]
+  kycSubmission  KycSubmission?
+  signals        Signal[]        @relation("BroadcastedByAdmin")
+
+  @@index([email])
+}
+
+model Mt5Account {
+  id            String   @id @default(uuid())
+  userId        String
+  brokerName    String
+  accountNumber String
+  serverName    String
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model KycSubmission {
+  id               String       @id @default(uuid())
+  userId           String       @unique
+  fullName         String
+  dateOfBirth      DateTime
+  nationality      String
+  documentType     DocumentType
+  documentFrontUrl String
+  documentBackUrl  String
+  selfieUrl        String
+  submittedAt      DateTime     @default(now())
+  reviewedAt       DateTime?
+  reviewNotes      String?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Signal {
+  id            String        @id @default(uuid())
+  adminId       String                                  // Admin User.id
+  instrument    String        @default("XAUUSD")
+  direction     SignalDirection
+  entryPrice    Float
+  stopLoss      Float
+  takeProfit    Float
+  status        SignalStatus  @default(ACTIVE)
+  openedAt      DateTime      @default(now())
+  closedAt      DateTime?
+
+  // Relations
+  admin User @relation("BroadcastedByAdmin", fields: [adminId], references: [id])
+
+  @@index([adminId])
+  @@index([status])
+  @@index([openedAt])
+}
+

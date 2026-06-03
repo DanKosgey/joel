@@ -1,6 +1,6 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
+# ==============================
+# Dependencies
+# ==============================
 /node_modules
 /.pnp
 .pnp.*
@@ -10,32 +10,95 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# ==============================
+# Next.js Build Output
+# ==============================
 /.next/
 /out/
-
-# production
 /build
+next-env.d.ts
+*.tsbuildinfo
 
-# misc
+# ==============================
+# Environment Variables (SECRETS)
+# ==============================
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# ==============================
+# IDE & Editor
+# ==============================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ==============================
+# OS Generated Files
+# ==============================
 .DS_Store
-*.pem
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
 
-# debug
+# ==============================
+# Testing & Coverage
+# ==============================
+/coverage
+*.lcov
+.nyc_output
+
+# ==============================
+# Debug Logs
+# ==============================
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# ==============================
+# Package Manager Lock Files
+# (keep only the one you use)
+# ==============================
+# package-lock.json
+# yarn.lock
 
-# vercel
+# ==============================
+# Certificates & Keys
+# ==============================
+*.pem
+*.key
+*.cert
+
+# ==============================
+# Vercel
+# ==============================
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# ==============================
+# Prisma
+# ==============================
+prisma/*.db
+prisma/*.db-journal
+
+# ==============================
+# Supabase Local
+# ==============================
+supabase/.temp/
+
+# ==============================
+# Misc
+# ==============================
+*.log
+.turbo
